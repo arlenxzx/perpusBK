@@ -26,7 +26,7 @@
                     <select class="form-control" id="buku_id">
                         <option value="">Pilih Buku</option>
                         @foreach($buku as $b)
-                            <option value="{{ $b->id }}">{{ $b->judul }} (Stok: {{ $b->stok }})</option>
+                            <option value="{{ $b->id }}" data-stok = {{ $b->stok }}>{{ $b->judul }} (Stok: {{ $b->stok }})</option>
                         @endforeach
                     </select>
                     <div class="invalid-feedback" id="alert-buku_id"></div>

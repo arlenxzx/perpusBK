@@ -74,7 +74,6 @@
         $(document).on('click', '#save-transaksi', function (e) {
             e.preventDefault();
             clearValidation();
-
             let id = $('#transaksi-id').val();
 
             let data = {
@@ -97,6 +96,17 @@
 
                 success: function (response) {
                     let t = response.data;
+
+                    let option = $('#buku_id option[value="' + t.buku_id + '"]');
+                    let stok = option.data('stok') - 1;
+
+                    if (stok <= 0) {
+                        option.remove();
+                    } else {
+                        option.attr('data-stok', stok);
+                        option.data('stok', stok);
+                        option.text(t.buku.judul + ' (Stok: ' + stok + ')');                        
+                    }
 
                     if (id) {
                         let row = $('#index_' + id);
@@ -193,8 +203,29 @@
 
                     success: function (response) {
                         let row = $('#index_' + id);
+                        let t = response.data;
+
+                        console.log('TRANSAKSI:', t);
+                        console.log('BUKU:', t.buku);
+
                         row.find('td:eq(4)').text('dikembalikan');
                         row.find('.btn-kembali-t').remove();
+
+                        let option = $('#buku_id option[value="' + t.buku_id + '"]');
+
+                        if (option.length) {
+                            option.attr('data-stok', t.buku.stok);
+                            option.data('stok', t.buku.stok);
+                            option.text(t.buku.judul + ' (Stok: ' + t.buku.stok + ')');
+                        }
+
+                        else {
+                            $('#buku_id').append(
+                                `<option value="${t.buku_id}" data-stok="${t.buku.stok}">
+                                    ${t.buku.judul} (Stok: ${t.buku.stok})
+                                </option>`
+                            );
+                        }
 
                         Swal.fire({
                             icon: 'success',
@@ -203,6 +234,10 @@
                             showConfirmButton: false,
                             timer: 1500
                         });
+                    },
+
+                    error: function (xhr) {
+                        console.log('ERROR:', xhr.responseText);
                     }
                 });
             });
