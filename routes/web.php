@@ -1,13 +1,12 @@
 <?php
 
 use App\Http\Controllers\BukuController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('layouts/app');
-});
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
 
 Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
 Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
