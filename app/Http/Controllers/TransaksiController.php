@@ -11,6 +11,10 @@ class TransaksiController extends Controller
 {
     public function index()
     {
+        Transaksi::where('status', 'dipinjam')
+            ->whereDate('due_date', '<', now())
+            ->update(['status' => 'expired']);
+
         return view('transaksi', [
             'transaksi' => Transaksi::with(['user', 'buku'])->latest()->get(),
             'user' => User::all(),
@@ -60,7 +64,7 @@ class TransaksiController extends Controller
             'buku_id' => 'required|exists:bukus,id',
             'tgl_pinjam' => 'required|date',
             'due_date' => 'required|date|after_or_equal:tgl_pinjam',
-            'status' => 'required|in:pending,dipinjam,dikembalikan',
+            'status' => 'required|in:pending,dipinjam,dikembalikan,expired',
         ]);
 
         $transaksi->update($data);

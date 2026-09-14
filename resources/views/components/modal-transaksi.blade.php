@@ -50,6 +50,7 @@
                         <option value="pending">Pending</option>
                         <option value="dipinjam">Dipinjam</option>
                         <option value="dikembalikan">Dikembalikan</option>
+                        <option value="expired">Expired</option>
                     </select>
                     <div class="invalid-feedback" id="alert-status"></div>
                 </div>

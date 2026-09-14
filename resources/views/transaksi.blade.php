@@ -12,7 +12,7 @@
                 </a>
             </div>
 
-            <table class="table table-borderless">
+            <table class="table table-borderless" id="table-transaksi">
                 <thead>
                     <tr>
                         <th>Peminjam</th>
@@ -57,7 +57,21 @@
 @section('scripts')
     <script>
     $(document).ready(function () {
-
+        let table = $('#table-transaksi').DataTable({
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[2, 'desc']],
+            language: {
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                paginate: {
+                    previous: '‹',
+                    next: '›'
+                },
+            zeroRecords: 'Data tidak ditemukan'
+            }
+        });
         // CREATE
         $(document).on('click', '#btn-create-t', function () {
             $('#transaksi-id').val('');
@@ -109,30 +123,37 @@
                     }
 
                     if (id) {
-                        let row = $('#index_' + id);
-                        row.find('td:eq(0)').text(t.user.name);
-                        row.find('td:eq(1)').text(t.buku.judul);
-                        row.find('td:eq(2)').text(t.tgl_pinjam);
-                        row.find('td:eq(3)').text(t.due_date);
-                        row.find('td:eq(4)').text(t.status);
+                        let row = table.row($('#index_' + id));
+                        row.data([
+                            t.user.name,
+                            t.buku.judul,
+                            t.tgl_pinjam,
+                            t.due_date,
+                            t.status,
+                            `
+                            ${t.status != 'dikembalikan'
+                                ? `<a href="javascript:void(0)" data-id="${t.id}" class="btn btn-success btn-sm btn-kembali-t">KEMBALI</a>`
+                                : ''
+                            }
+                            <a href="javascript:void(0)" data-id="${t.id}" class="btn btn-primary btn-sm btn-edit-t">EDIT</a>
+                            <a href="javascript:void(0)" data-id="${t.id}" class="btn btn-danger btn-sm btn-delete-t">DELETE</a>
+                            `
+                        ]).draw(false);
                     } else {
-                        $('#table-transaksi').prepend(`
-                            <tr id="index_${t.id}">
-                                <td>${t.user.name}</td>
-                                <td>${t.buku.judul}</td>
-                                <td>${t.tgl_pinjam}</td>
-                                <td>${t.due_date}</td>
-                                <td>${t.status}</td>
-                                <td>
-                                    <a href="javascript:void(0)" data-id="${t.id}"
-                                       class="btn btn-success btn-sm btn-kembali-t">KEMBALI</a>
-                                    <a href="javascript:void(0)" data-id="${t.id}"
-                                       class="btn btn-primary btn-sm btn-edit-t">EDIT</a>
-                                    <a href="javascript:void(0)" data-id="${t.id}"
-                                       class="btn btn-danger btn-sm btn-delete-t">DELETE</a>
-                                </td>
-                            </tr>
-                        `);
+                        let row = table.row.add([
+                        t.user.name,
+                        t.buku.judul,
+                        t.tgl_pinjam,
+                        t.due_date,
+                        t.status,
+                        `
+                        <a href="javascript:void(0)" data-id="${t.id}" class="btn btn-success btn-sm btn-kembali-t">KEMBALI</a>
+                        <a href="javascript:void(0)" data-id="${t.id}" class="btn btn-primary btn-sm btn-edit-t">EDIT</a>
+                        <a href="javascript:void(0)" data-id="${t.id}" class="btn btn-danger btn-sm btn-delete-t">DELETE</a>
+                        `
+                    ]);
+                    $(row.node()).attr('id', 'index_' + t.id);
+                    row.draw(false);
                     }
 
                     bootstrap.Modal.getInstance(
@@ -140,11 +161,13 @@
                     )?.hide();
 
                     Swal.fire({
+                        toast: true,
+                        position: 'top-end',
                         icon: 'success',
-                        title: 'Berhasil!',
-                        text: response.message,
+                        title: id ? 'Transaksi berhasil diubah' : 'Transaksi berhasil ditambahkan',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 1800,
+                        timerProgressBar: true
                     });
                 },
 
@@ -228,11 +251,13 @@
                         }
 
                         Swal.fire({
+                            toast: true,
+                            position: 'top-end',
                             icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
+                            title: 'Buku berhasil dikembalikan',
                             showConfirmButton: false,
-                            timer: 1500
+                            timer: 1800,
+                            timerProgressBar: true
                         });
                     },
 
@@ -271,11 +296,13 @@
                         });
 
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            title: 'Transaksi berhasil dihapus',
                             showConfirmButton: false,
-                            timer: 1500
+                            timer: 1800,
+                            timerProgressBar: true
                         });
                     }
                 });

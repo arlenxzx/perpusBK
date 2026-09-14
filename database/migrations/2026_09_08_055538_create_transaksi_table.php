@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('tgl_pinjam');
             $table->date('due_date');
             $table->date('tgl_kembali')->nullable();
-            $table->enum('status', ['pending', 'dipinjam', 'dikembalikan'])->default('pending');
+            $table->enum('status', ['pending', 'dipinjam', 'dikembalikan', 'expired'])->default('pending');
             $table->timestamps();
         });
     }
